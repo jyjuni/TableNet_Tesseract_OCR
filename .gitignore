@@ -1,3 +1,4 @@
 model/
-dataset/
-best_model/
+dataset/Fintabnet_data/
+dataset/Marmot_data/
+model/
