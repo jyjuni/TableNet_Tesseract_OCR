@@ -1,4 +1,4 @@
-# TableNet
+# TableNet and OCR
 Table Detection and Information Extraction based on TableNet and Tesseract. 
 
 Implementation of Paper <i>TableNet: Deep Learning model for end-to-end Table detection and Tabular data extraction from Scanned Document Images</i>: https://arxiv.org/abs/2001.01469
