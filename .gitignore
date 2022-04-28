@@ -1,4 +1,7 @@
 model/
-dataset/Fintabnet_data/
+dataset/Fintabnet_data/ocr_*
+dataset/Fintabnet_data/*_mask
+dataset/Fintabnet_data/input
+
 dataset/Marmot_data/
-model/
+

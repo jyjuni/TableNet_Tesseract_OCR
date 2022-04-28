@@ -1,7 +1,9 @@
-Amortization of intangible assets $1,823 $1.980 $1,931
+Fiscal Year
+(in millions) 2018 2017 2016
+Amortization of intangible assets $1,823 $1,980 $1,931
 Restructuring charges, net 30 363 290
 Acquisition-related items 104 220 283
-Certain litigation charges 51 300 25
+Certain litigation charges 61 300 26
 Divestiture-related items 114 — —
 Gain on sale of businesses (697) — —
 Special charge 80 100 —

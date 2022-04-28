@@ -1,0 +1,11 @@
+(in millions)	2018	2017	2016
+Amortization of intangible assets	$1,823	$1.980	$1,931
+Restructuring charges, net	30	363	290
+Acquisition-related items	104	220	283
+Certain litigation charges	51	300	25
+Divestiture-related items	114	—	—
+Gain on sale of businesses	(697)	—	—
+Special charge	0	100	—
+Other expense, net	505	222	107
+Investment loss	227	—	70
+Interest expense, net	749	728	955
