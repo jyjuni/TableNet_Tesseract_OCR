@@ -182,7 +182,7 @@ def get_borders(structured=None, kernel0=2, kernel1=7,
     """
     
     # make sure the input image is valid
-    assert thresh_values is not None
+    assert structured is not None
     
     r,c = structured.shape
     
@@ -226,9 +226,9 @@ def get_borders(structured=None, kernel0=2, kernel1=7,
     listy.append(c-1) #add the bottom edge
 
 
-
-    coords = np.array([[x,y] for x in listx for y in listy])
-    
+    # coords = np.array([[x,y] for x in listx for y in listy])
+    coords = list()
+        
     print('Row coordinates: ', listx)
     print('Column coordinates: ', listy)
     
@@ -256,7 +256,7 @@ def get_borders(structured=None, kernel0=2, kernel1=7,
         plt.show()
 
     
-    return coords
+    return listx, listy
 
 def main():
     # EXAMPLE: TABLE CELL

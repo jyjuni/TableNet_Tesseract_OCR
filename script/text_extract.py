@@ -1,55 +1,81 @@
-import cv2
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+%load_ext autoreload
+%autoreload 2
 
+import cv2
 import pytesseract as pt
 from itertools import repeat
+import matplotlib.pyplot as plt
 import csv
+import numpy as np
+from PIL import Image, ImageFilter
+from script.ocr_preprocess import get_structure, get_borders
 
+def extract(test_file_path, output_text_path, method="table"):
+	"""
+    reads image of tabular data and perform ocr recognition 
+    and returns recognized text result with table structure
+    
+    arguments
+    -----------
+	test_file_path		string, path for input file to be recognized
+	output_text_path	string, the output path for txt file
+    method          	string, ("table", "cell"), the ocr recognition mode
+    
+    returns			
+    -----------
+    data         	string, structured text of ocr recognizition result
+    
+    """
+	assert method in ("table", "cell")
 
-def text_extract(test_file_path, output_csv_path, tesseract_path, output_text_path):
-	pt.pytesseract.tesseract_cmd = tesseract_path
 	image = cv2.imread(test_file_path)
-	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+	raw = image.copy()
+	
+	# adjust image
+	image = adjust(image)
+	_, image = remove_background(image, method="binary", thresh=150, sharpen=True, tozero_thresh = [100,200])
 
-	# Repair horizontal table lines 
-	kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,1))
-	thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
+	# show preview
+	show_images(raw, image)
 
-	# Remove horizontal lines
-	horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (55,2))
-	detect_horizontal = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, horizontal_kernel, iterations=2)
-	cnts = cv2.findContours(detect_horizontal, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-	for c in cnts:
-	    cv2.drawContours(image, [c], -1, (255,255,255), 9)
+	# OCR 
+	# config options: https://stackoverflow.com/questions/44619077/pytesseract-ocr-multiple-config-options
 
-	# Remove vertical lines
-	vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,55))
-	detect_vertical = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, vertical_kernel, iterations=2)
-	cnts = cv2.findContours(detect_vertical, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-	for c in cnts:
-	    cv2.drawContours(image, [c], -1, (255,255,255), 9)
+	if method=="table":
+		## Table-wise mode (--psm=6)
+		data = pt.image_to_string(image, lang='fintabnet_full', config='--psm 6') 
+		print(data)
 
-	data = pt.image_to_string(image, lang='eng',config='--psm 6')
-	print(data)
+	elif method=="cell":
+		# get the table structure
+		thresh_values = get_structure(image, binary=True)
+
+		# coordinates for border lines
+		listx, listy = get_borders(thresh_values, plot=False, kernel1 = 7, erode0_iter=1, erode1_iter=1, 
+							dilate0_iter=2, dilate1_iter=3,
+							stripe1=6,
+							img=img, img_name=img_name)
+
+		# record coordinates pairs
+		coords = list()
+		for i in range(len(listx)-1):
+			coords.append((listx[i],listx[i+1],listy[0],listy[-1])) #(x_min, x_max, y_min, y_max)
+
+		# ocr prediction
+		rows = list()
+		for i, coord in enumerate(coords):
+			print(coord)
+			x_min, x_max, y_min, y_max = coord
+			cell_image = image[x_min:x_max, y_min:y_max]
+			row_data = pt.image_to_string(cell_image, lang='fintabnet_full', config='--psm 7') 
+			# print(row_data)
+			rows.append(row_data)
+
+		data = "".join(rows)
+
+
+	# write data to txt
 	with open(output_text_path, "w+") as f:
 		f.write(data)
 
-	with open(output_text_path, 'r') as in_file:
-	    stripped = (line.strip() for line in in_file)
-	    lines = (line.split("|") for line in stripped if line)
-	    with open(output_csv_path, 'w') as out_file:
-	        writer = csv.writer(out_file)
-	        writer.writerow((' ', ' '))
-	        writer.writerows(lines)
-
-
-	
+	return data
