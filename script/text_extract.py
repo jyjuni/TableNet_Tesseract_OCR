@@ -1,6 +1,3 @@
-%load_ext autoreload
-%autoreload 2
-
 import cv2
 import pytesseract as pt
 from itertools import repeat
