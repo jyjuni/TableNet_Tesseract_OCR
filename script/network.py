@@ -16,7 +16,8 @@ from tensorflow.keras.layers import Input, Concatenate, UpSampling2D
 class TableNet:
   @staticmethod
   def build_table_decoder(inputs, pool3, pool4):
-    x = Conv2D(512, (1, 1), activation = 'relu', name='conv7_table')(inputs)
+    x = Conv2D(256, (1, 1), activation = 'relu', name='conv7_table')(inputs)
+#     x = Conv2D(512, (1, 1), activation = 'relu', name='conv7_table')(inputs)
     x = UpSampling2D(size=(2, 2))(x)
 
     concatenated = Concatenate()([x, pool4])
@@ -44,7 +45,8 @@ class TableNet:
     x = Conv2D(512, (1, 1), activation = 'relu', name='block7_conv1_column')(inputs)
     x = Dropout(0.8, name='block7_dropout_column')(x)
 
-    x = Conv2D(512, (1, 1), activation = 'relu', name='block8_conv1_column')(x)
+    x = Conv2D(256, (1, 1), activation = 'relu', name='block8_conv1_column')(x)
+#     x = Conv2D(512, (1, 1), activation = 'relu', name='block8_conv1_column')(x)
     x = UpSampling2D(size=(2, 2))(x)
 
     concatenated = Concatenate()([x, pool4])
